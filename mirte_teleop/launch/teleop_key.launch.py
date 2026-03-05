@@ -18,7 +18,7 @@ hostname = platform.node().replace("-", "_").lower()
 sys.exit(
     subprocess.call(
         [
-            "/opt/ros/humble/lib/teleop_twist_keyboard/teleop_twist_keyboard",
+            "/opt/ros/jazzy/lib/teleop_twist_keyboard/teleop_twist_keyboard",
             "--ros-args",
             "-r",
             f"cmd_vel:=/mirte_base_controller/cmd_vel",

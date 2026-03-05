@@ -7,137 +7,150 @@
 <xacro:arg name="past_ignition" default="true" />
 
 <xacro:macro name="joint" params="name prefix">
-      <joint name="${prefix}${name}_wheel_joint">
-        <command_interface name="velocity"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-
+  <joint name="${prefix}${name}_wheel_joint">
+    <command_interface name="velocity"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+  </joint>
 </xacro:macro>
+<xacro:if value="$(arg sim)">
+  <ros2_control name="GazeboSimSystem" type="system">
 
-  <xacro:unless value="$(arg sim)">
-   <ros2_control name="mecanumdrive" type="system">
-      <hardware>
-        <xacro:unless value="$(arg sim)">
-          <plugin>mirte_base_control/MirteBaseHWInterface</plugin>
-          <param name="ticks">${params['ticks']}</param>
-          <param name="enable_pid">${params['enable_pid']}</param>
-          <param name="kp">${params['kp']}</param>
-          <param name="ki">${params['ki']}</param>
-          <param name="kd">${params['kd']}</param>
-          <param name="i_clamp">${params['i_clamp']}</param>
-          <param name="antiwindup">${params['antiwindup']}</param>
-        </xacro:unless>
-      </hardware>
-
-        <xacro:joint prefix="$(arg prefix)" name="front_left" />
-        <xacro:joint prefix="$(arg prefix)" name="rear_left" />
-        <xacro:joint prefix="$(arg prefix)" name="rear_right" />
-        <xacro:joint prefix="$(arg prefix)" name="front_right" />
+    <xacro:joint prefix="$(arg prefix)" name="front_left" />
+    <xacro:joint prefix="$(arg prefix)" name="rear_left" />
+    <xacro:joint prefix="$(arg prefix)" name="rear_right" />
+    <xacro:joint prefix="$(arg prefix)" name="front_right" />
+  </ros2_control>
+</xacro:if>
 
 
 
-    </ros2_control>
+
+<ros2_control name="mecanumdrive" type="system">
+  <hardware>
+    <xacro:if value="$(arg sim)">
+      <xacro:if value="$(arg past_ignition)">
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </xacro:if>
+      <xacro:unless value="$(arg past_ignition)">
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+      </xacro:unless>
+    </xacro:if>
+    <xacro:unless value="$(arg sim)">
+      <plugin>mirte_base_control/MirteBaseHWInterface</plugin>
+        <param name="ticks">${params['ticks']}</param>
+        <param name="enable_pid">${params['enable_pid']}</param>
+        <param name="kp">${params['kp']}</param>
+        <param name="ki">${params['ki']}</param>
+        <param name="kd">${params['kd']}</param>
+        <param name="i_clamp">${params['i_clamp']}</param>
+        <param name="antiwindup">${params['antiwindup']}</param>
     </xacro:unless>
+  </hardware>
+
+  <xacro:joint prefix="$(arg prefix)" name="front_left" />
+  <xacro:joint prefix="$(arg prefix)" name="rear_left" />
+  <xacro:joint prefix="$(arg prefix)" name="rear_right" />
+  <xacro:joint prefix="$(arg prefix)" name="front_right" />
+
+</ros2_control>
+
 
 
 
 <ros2_control name="ros2_arm_control" type="system">
-      <hardware>
-        <xacro:if value="$(arg sim)">
-          <xacro:if value="$(arg past_ignition)">
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-          </xacro:if>
-          <xacro:unless value="$(arg past_ignition)">
-            <plugin>ign_ros2_control/IgnitionSystem</plugin>
-          </xacro:unless>
-        </xacro:if>
-        <xacro:unless value="$(arg sim)">
-          <plugin>mirte_master_arm_control/MirteMasterArmHWInterface</plugin>
-        </xacro:unless>
-      </hardware>
+  <hardware>
+    <xacro:if value="$(arg sim)">
+      <xacro:if value="$(arg past_ignition)">
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </xacro:if>
+      <xacro:unless value="$(arg past_ignition)">
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+      </xacro:unless>
+    </xacro:if>
+    <xacro:unless value="$(arg sim)">
+      <plugin>mirte_master_arm_control/MirteMasterArmHWInterface</plugin>
+    </xacro:unless>
+  </hardware>
 
-   <joint name="shoulder_pan_joint">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity" />
-   </joint>
+  <joint name="shoulder_pan_joint">
+    <command_interface name="position"/>
+    <state_interface name="position"/>
+    <state_interface name="velocity" />
+  </joint>
 
-    <joint name="shoulder_lift_joint">
-        <command_interface name="position"/>
-        <state_interface name="position">
-          <param name="initial_value">-1.56</param>
-        </state_interface>
-        <state_interface name="velocity" />
-    </joint>
+  <joint name="shoulder_lift_joint">
+    <command_interface name="position"/>
+    <state_interface name="position">
+      <param name="initial_value">-1.56</param>
+    </state_interface>
+    <state_interface name="velocity" />
+  </joint>
 
-    <joint name="elbow_joint">
-        <command_interface name="position"/>
-        <state_interface name="position">
-          <param name="initial_value">-1.56</param>
-        </state_interface>
-        <state_interface name="velocity" />
-    </joint>
+  <joint name="elbow_joint">
+    <command_interface name="position"/>
+    <state_interface name="position">
+      <param name="initial_value">-1.56</param>
+    </state_interface>
+    <state_interface name="velocity" />
+  </joint>
 
-    <joint name="wrist_joint">
-        <command_interface name="position"/>
-        <state_interface name="position">
-          <param name="initial_value">1.56</param>
-        </state_interface>
-        <state_interface name="velocity" />
-    </joint>
+  <joint name="wrist_joint">
+    <command_interface name="position"/>
+    <state_interface name="position">
+      <param name="initial_value">1.56</param>
+    </state_interface>
+    <state_interface name="velocity" />
+  </joint>
 </ros2_control>
 
 
 <ros2_control name="ros2_gripper_control" type="system">
-     <hardware>
-        <xacro:if value="$(arg sim)">
-          <xacro:if value="$(arg past_ignition)">
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-          </xacro:if>
-          <xacro:unless value="$(arg past_ignition)">
-            <plugin>ign_ros2_control/IgnitionSystem</plugin>
-          </xacro:unless>
-        </xacro:if>
-        <xacro:unless value="$(arg sim)">
-          <plugin>mirte_master_arm_control/MirteMasterArmHWInterface</plugin>
-        </xacro:unless>
-      </hardware>
+  <hardware>
+    <xacro:if value="$(arg sim)">
+      <xacro:if value="$(arg past_ignition)">
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </xacro:if>
+      <xacro:unless value="$(arg past_ignition)">
+        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+      </xacro:unless>
+    </xacro:if>
+    <xacro:unless value="$(arg sim)">
+      <plugin>mirte_master_arm_control/MirteMasterArmHWInterface</plugin>
+    </xacro:unless>
+  </hardware>
 
-    <joint name="gripper_joint">
-        <command_interface name="position" />
-        <state_interface name="position" />
-        <state_interface name="velocity" />
+  <joint name="gripper_joint">
+    <command_interface name="position" />
+    <state_interface name="position" />
+    <state_interface name="velocity" />
+  </joint>
+
+  <xacro:if value="$(arg sim)">
+    <joint name="_Gripper_joint_r">
+      <param name="mimic">gripper_joint</param>
+      <param name="multiplier">-1</param>
+      <!--<command_interface name="position"/> mimic joints cannot have command interfaces-->
+      <state_interface name="position" />
+      <state_interface name="velocity" />
     </joint>
 
-    <xacro:if value="$(arg sim)">
+    <joint name="_gripper_link_joint_l">
+      <param name="mimic">gripper_joint</param>
+      <param name="multiplier">-1.4</param> 
+      <!--<command_interface name="position"/> mimic joints cannot have command interfaces-->
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
 
-      <joint name="_Gripper_joint_r">
-        <param name="mimic">gripper_joint</param>
-        <param name="multiplier">-1</param>
-        <command_interface name="position"/>
-        <state_interface name="position" />
-        <state_interface name="velocity" />
-      </joint>
-
-      <joint name="_gripper_link_joint_l">
-        <param name="mimic">gripper_joint</param>
-        <param name="multiplier">-1.4</param> 
-        <command_interface name="position"/>
-        <state_interface name="position" />
-        <state_interface name="velocity" />
-      </joint>
-
-      <joint name="_gripper_link_joint_r">
-        <param name="mimic">gripper_joint</param>
-        <param name="multiplier">1.4</param>  
-        <command_interface name="position"/>
-        <state_interface name="position" />
-        <state_interface name="velocity" />
-      </joint>
-
-    </xacro:if>
-
+    <joint name="_gripper_link_joint_r">
+      <param name="mimic">gripper_joint</param>
+      <param name="multiplier">1.4</param>  
+      <!--<command_interface name="position"/>-->
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+  </xacro:if>
 </ros2_control>
 
 <gazebo>
